@@ -1,0 +1,93 @@
+@use "mixins" as px;
+
+$cobweb: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120' fill='none' stroke='white' stroke-width='0.8' stroke-linecap='round'%3E%3Cpath d='M120 0L120.0 118.0M120 0L74.8 109.0M120 0L36.6 83.4M120 0L11.0 45.2M120 0L2.0 0.0M120.0 28.0Q115.3 23.6 109.3 25.9M109.3 25.9Q106.6 20.0 100.2 19.8M100.2 19.8Q100.0 13.4 94.1 10.7M94.1 10.7Q96.4 4.7 92.0 0.0M120.0 52.0Q111.3 43.9 100.1 48.0M100.1 48.0Q95.2 37.2 83.2 36.8M83.2 36.8Q82.8 24.8 72.0 19.9M72.0 19.9Q76.1 8.7 68.0 0.0M120.0 76.0Q107.2 64.1 90.9 70.2M90.9 70.2Q83.7 54.3 66.3 53.7M66.3 53.7Q65.7 36.3 49.8 29.1M49.8 29.1Q55.9 12.8 44.0 0.0M120.0 100.0Q103.2 84.3 81.7 92.4M81.7 92.4Q72.2 71.5 49.3 70.7M49.3 70.7Q48.5 47.8 27.6 38.3M27.6 38.3Q35.7 16.8 20.0 0.0'/%3E%3C/svg%3E");
+$bat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 20' fill='white'%3E%3Cpath d='M20 12C16 6 8 4 0 8C4 9 6 12 6 16C9 13 12 13 14 16C16 14 18 14 20 18C22 14 24 14 26 16C28 13 31 13 34 16C34 12 36 9 40 8C32 4 24 6 20 12ZM18 10L19 4L20 8L21 4L22 10Z'/%3E%3C/svg%3E");
+
+html.theme-halloween {
+  --color-px-deleted-icon: #E5707B;
+  --color-px-ghost: #B14CFF;
+  --halloween-glow: #{rgba(242, 107, 12, 0.55)};
+
+  @include px.incoming-bubble(#1D1727);
+  @include px.own-bubble-fill(linear-gradient(135deg, #3B1A5E, #26113F));
+
+  // Fog at the bottom of the chat area
+  .messages-layout::before {
+    @include px.chat-decoration;
+
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    height: 45%;
+
+    background:
+      radial-gradient(ellipse 80% 70% at 20% 100%, rgba(177, 76, 255, 0.2), transparent 70%),
+      radial-gradient(ellipse 70% 60% at 85% 100%, rgba(242, 107, 12, 0.14), transparent 70%);
+  }
+
+  // Cobwebs in the top corners and a few bats
+  .messages-layout::after {
+    @include px.chat-decoration;
+
+    inset: 0;
+
+    opacity: 0.1;
+    background-image: $cobweb, $cobweb, $bat, $bat, $bat;
+    background-repeat: no-repeat;
+    background-position: right top, left top, 14% 22%, 78% 64%, 40% 86%;
+    background-size: 9rem 9rem, 9rem 9rem, 2rem 1rem, 1.5rem 0.75rem, 1.75rem 0.875rem;
+  }
+
+  .main-button {
+    &::after {
+      pointer-events: none;
+      content: "";
+
+      position: absolute;
+      inset: 0;
+
+      border-radius: 50%;
+
+      opacity: 0.8;
+      box-shadow: 0 0 1rem 0.125rem var(--halloween-glow);
+    }
+  }
+
+  @include px.ambient {
+    .main-button::after {
+      animation: px-flicker 3.6s steps(1, end) infinite;
+    }
+  }
+}
+
+@keyframes px-flicker {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+
+  8% {
+    opacity: 0.45;
+  }
+
+  12% {
+    opacity: 0.85;
+  }
+
+  40% {
+    opacity: 0.7;
+  }
+
+  44% {
+    opacity: 0.4;
+  }
+
+  47% {
+    opacity: 0.9;
+  }
+
+  80% {
+    opacity: 0.75;
+  }
+}

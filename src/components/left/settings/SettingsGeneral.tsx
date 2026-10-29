@@ -4,7 +4,7 @@ import {
 import { getActions, withGlobal } from '../../../global';
 
 import type { SharedSettings } from '../../../global/types';
-import type { ThemeKey, TimeFormat } from '../../../types';
+import type { TimeFormat } from '../../../types';
 import type { IRadioOption } from '../../ui/RadioGroup';
 import { SettingsScreens } from '../../../types';
 
@@ -12,7 +12,6 @@ import { selectSharedSettings } from '../../../global/selectors/sharedState';
 import {
   IS_ANDROID, IS_IOS, IS_MAC_OS,
 } from '../../../util/browser/windowEnvironment';
-import { getSystemTheme } from '../../../util/systemTheme';
 
 import useAppLayout from '../../../hooks/useAppLayout';
 import useHistoryBack from '../../../hooks/useHistoryBack';
@@ -24,6 +23,7 @@ import Checkbox from '../../ui/Checkbox';
 import ListItem from '../../ui/ListItem';
 import RadioGroup from '../../ui/RadioGroup';
 import RangeSlider from '../../ui/RangeSlider';
+import SettingsThemePicker from './SettingsThemePicker';
 
 type OwnProps = {
   isActive?: boolean;
@@ -35,9 +35,7 @@ type StateProps =
     'messageTextSize' |
     'messageSendKeyCombo' |
     'shouldReplaceTextShortcuts' |
-    'timeFormat' |
-    'theme' |
-    'shouldUseSystemTheme'
+    'timeFormat'
   )>;
 
 const SettingsGeneral = ({
@@ -46,8 +44,6 @@ const SettingsGeneral = ({
   messageSendKeyCombo,
   shouldReplaceTextShortcuts,
   timeFormat,
-  theme,
-  shouldUseSystemTheme,
   onReset,
 }: OwnProps & StateProps) => {
   const {
@@ -65,17 +61,6 @@ const SettingsGeneral = ({
   }, {
     label: lang('SettingsTimeFormat24'),
     value: '24h',
-  }];
-
-  const appearanceThemeOptions: IRadioOption[] = [{
-    label: lang('EmptyChatAppearanceLight'),
-    value: 'light',
-  }, {
-    label: lang('EmptyChatAppearanceDark'),
-    value: 'dark',
-  }, {
-    label: lang('EmptyChatAppearanceSystem'),
-    value: 'auto',
   }];
 
   const keyboardSendOptions = !isMobileDevice ? [
@@ -96,13 +81,6 @@ const SettingsGeneral = ({
     document.documentElement.setAttribute('data-message-text-size', newSize.toString());
 
     setSharedSettingOption({ messageTextSize: newSize });
-  }, []);
-
-  const handleAppearanceThemeChange = useCallback((value: string) => {
-    const newTheme = value === 'auto' ? getSystemTheme() : value as ThemeKey;
-
-    setSharedSettingOption({ theme: newTheme });
-    setSharedSettingOption({ shouldUseSystemTheme: value === 'auto' });
   }, []);
 
   const handleTimeFormatChange = useCallback((newTimeFormat: string) => {
@@ -146,12 +124,7 @@ const SettingsGeneral = ({
 
       <IslandTitle dir={lang.isRtl ? 'rtl' : undefined}>{lang('Theme')}</IslandTitle>
       <Island>
-        <RadioGroup
-          name="theme"
-          options={appearanceThemeOptions}
-          selected={shouldUseSystemTheme ? 'auto' : theme}
-          onChange={handleAppearanceThemeChange}
-        />
+        <SettingsThemePicker />
       </Island>
 
       <IslandTitle dir={lang.isRtl ? 'rtl' : undefined}>{lang('SettingsTimeFormat')}</IslandTitle>
@@ -188,8 +161,6 @@ const SettingsGeneral = ({
 export default memo(withGlobal<OwnProps>(
   (global): Complete<StateProps> => {
     const {
-      theme,
-      shouldUseSystemTheme,
       messageSendKeyCombo,
       shouldReplaceTextShortcuts,
       messageTextSize,
@@ -201,8 +172,6 @@ export default memo(withGlobal<OwnProps>(
       shouldReplaceTextShortcuts,
       messageTextSize,
       timeFormat,
-      theme,
-      shouldUseSystemTheme,
     };
   },
 )(SettingsGeneral));

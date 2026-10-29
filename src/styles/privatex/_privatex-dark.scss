@@ -1,0 +1,38 @@
+@use "mixins" as px;
+
+$ink: #0B0C0E;
+
+html.theme-privatex-dark {
+  --color-px-deleted-icon: #C9737B;
+  --color-px-ghost: #B8BDC7;
+
+  @include px.hairline-surfaces(#23262D);
+  @include px.incoming-bubble(#1A1C21);
+  @include px.ink-on-primary($ink);
+
+  .MessageMeta {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
+
+  // White active chat: every `--color-white` text in the item is flipped to ink above
+  @media (min-width: 600px) {
+    .Chat.selected:not(.forum) {
+      .VerifiedIcon,
+      .StarIcon {
+        --color-fill: #{$ink};
+        --color-checkmark: #F2F3F5;
+      }
+
+      .chat-tag {
+        color: $ink;
+        background-color: #0B0C0E26;
+      }
+
+      .monoforum-badge {
+        color: #F2F3F5;
+        background-color: $ink;
+      }
+    }
+  }
+}

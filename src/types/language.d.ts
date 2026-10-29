@@ -437,6 +437,24 @@ export interface LangPair {
   'General': undefined;
   'DataSettings': undefined;
   'PrivacySettings': undefined;
+  'PrivateXSettings': undefined;
+  'PrivateXSettingsDesc': undefined;
+  'SettingsKeywordsPrivateX': undefined;
+  'PrivateXGhostMode': undefined;
+  'PrivateXGhostModeEnable': undefined;
+  'PrivateXGhostModeActive': undefined;
+  'PrivateXGhostModeDesc': undefined;
+  'PrivateXGhostReadReceipts': undefined;
+  'PrivateXGhostStoryViews': undefined;
+  'PrivateXGhostMediaPlayback': undefined;
+  'PrivateXGhostOnline': undefined;
+  'PrivateXGhostTyping': undefined;
+  'PrivateXGhostModeNote': undefined;
+  'PrivateXAntiDelete': undefined;
+  'PrivateXAntiDeleteEnable': undefined;
+  'PrivateXAntiDeleteDesc': undefined;
+  'PrivateXAntiDeleteClear': undefined;
+  'PrivateXAntiDeleteClearConfirm': undefined;
   'Language': undefined;
   'LanguageTitle': undefined;
   'LanguageNotFound': undefined;
@@ -3376,6 +3394,14 @@ export interface LangPair {
   'SettingsKeywordsLastSeen': undefined;
   'SettingsKeywordsLogOut': undefined;
   'SettingsSearchEmpty': undefined;
+  'ThemePrivateXDark': undefined;
+  'ThemePrivateXLight': undefined;
+  'ThemeHalloween': undefined;
+  'ThemeWinter': undefined;
+  'ThemeRainbow': undefined;
+  'ThemeRed': undefined;
+  'ThemeFollowSystem': undefined;
+  'ThemeFollowSystemDesc': undefined;
 }
 
 export interface LangPairWithVariables<V = LangVariable> {
@@ -3572,6 +3598,9 @@ export interface LangPairWithVariables<V = LangVariable> {
   };
   'AutodownloadSizeLimitUpTo': {
     'limit': V;
+  };
+  'PrivateXMessageDeletedAt': {
+    'date': V;
   };
   'LanguageAlert': {
     'language': V;
@@ -5680,6 +5709,9 @@ export interface LangPairPluralWithVariables<V = LangVariable> {
   'Months': {
     'count': V;
   };
+  'PrivateXAntiDeleteStorage': {
+    'days': V;
+  };
   'Users': {
     'count': V;
   };
@@ -6681,6 +6713,34 @@ export interface LangKeyGroups {
       | 'StarsReactionText';
     variables: 'chat';
   };
+  'date': {
+    keys:
+      | 'PrivateXMessageDeletedAt'
+      | 'MessageScheduledOn'
+      | 'MessageTooltipEditedDate'
+      | 'MessageTooltipForwardedDate'
+      | 'LastSeenAtDate'
+      | 'ChannelPermissionDeniedSendMessagesUntil'
+      | 'ProfileBirthdayValue'
+      | 'ProfileBirthdayTodayValue'
+      | 'ActionGroupCallScheduledChannel'
+      | 'NotificationGiftCanResellAt'
+      | 'NotificationGiftCanTransferAt'
+      | 'SettingsPasskeyUsedAt'
+      | 'BoostExpireOn'
+      | 'BoostingGiveawayNotEligible'
+      | 'BoostingUsedLinkDate'
+      | 'ChatPrivateMessageEditTimestampDate'
+      | 'LiveLocationUpdatedAtDate'
+      | 'MessageReadAt'
+      | 'StarsSubscriptionCancelInfo'
+      | 'StarsSubscriptionExpired'
+      | 'StarsSubscriptionExpiredInfo'
+      | 'StarsSubscriptionExpires'
+      | 'StarsSubscriptionRefulfillInfo'
+      | 'StarsSubscriptionRenews';
+    variables: 'date';
+  };
   'language,link,percent,settings': {
     keys:
       | 'LanguageAlert'
@@ -6832,33 +6892,6 @@ export interface LangKeyGroups {
     keys:
       | 'PollResultsAnswerTitle';
     variables: 'answer' | 'percent';
-  };
-  'date': {
-    keys:
-      | 'MessageScheduledOn'
-      | 'MessageTooltipEditedDate'
-      | 'MessageTooltipForwardedDate'
-      | 'LastSeenAtDate'
-      | 'ChannelPermissionDeniedSendMessagesUntil'
-      | 'ProfileBirthdayValue'
-      | 'ProfileBirthdayTodayValue'
-      | 'ActionGroupCallScheduledChannel'
-      | 'NotificationGiftCanResellAt'
-      | 'NotificationGiftCanTransferAt'
-      | 'SettingsPasskeyUsedAt'
-      | 'BoostExpireOn'
-      | 'BoostingGiveawayNotEligible'
-      | 'BoostingUsedLinkDate'
-      | 'ChatPrivateMessageEditTimestampDate'
-      | 'LiveLocationUpdatedAtDate'
-      | 'MessageReadAt'
-      | 'StarsSubscriptionCancelInfo'
-      | 'StarsSubscriptionExpired'
-      | 'StarsSubscriptionExpiredInfo'
-      | 'StarsSubscriptionExpires'
-      | 'StarsSubscriptionRefulfillInfo'
-      | 'StarsSubscriptionRenews';
-    variables: 'date';
   };
   'amount': {
     keys:
@@ -8046,6 +8079,12 @@ export interface LangPluralKeyGroups {
       | 'PageTitleNotifications';
     variables: 'count';
   };
+  'days': {
+    keys:
+      | 'PrivateXAntiDeleteStorage'
+      | 'GiftWithdrawWait';
+    variables: 'days';
+  };
   'index': {
     keys:
       | 'PinnedMessageTitle';
@@ -8078,11 +8117,6 @@ export interface LangPluralKeyGroups {
     keys:
       | 'GiftInfoAvailabilityValue';
     variables: 'count' | 'total';
-  };
-  'days': {
-    keys:
-      | 'GiftWithdrawWait';
-    variables: 'days';
   };
   'count,title': {
     keys:

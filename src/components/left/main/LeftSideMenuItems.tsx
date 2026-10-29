@@ -31,6 +31,7 @@ import { IS_MULTIACCOUNT_SUPPORTED, IS_TAURI } from '../../../util/browser/globa
 import { getPromptInstall } from '../../../util/installPrompt';
 import { switchPermanentWebVersion } from '../../../util/permanentWebVersion';
 import { getSystemTheme } from '../../../util/systemTheme';
+import { getPrivateXThemeForScheme } from '../../../privatex/themes/themes';
 
 import useFlag from '../../../hooks/useFlag';
 import { useFolderManagerForUnreadCounters } from '../../../hooks/useFolderManager';
@@ -91,6 +92,8 @@ const LeftSideMenuItems = ({
   const {
     openChat,
     setSharedSettingOption,
+    setPrivateXTheme,
+    setShouldUseSystemTheme,
     updatePerformanceSettings,
     openChatByUsername,
     openUrl,
@@ -127,10 +130,11 @@ const LeftSideMenuItems = ({
   const handleDarkModeToggle = useLastCallback((e: React.SyntheticEvent<HTMLElement>) => {
     e.stopPropagation();
     const newTheme = theme === 'light' ? 'dark' : 'light';
-    const shouldUseSystemTheme = newTheme === getSystemTheme();
 
-    setSharedSettingOption({ theme: newTheme });
-    setSharedSettingOption({ shouldUseSystemTheme });
+    setPrivateXTheme({ themeKey: getPrivateXThemeForScheme(newTheme) });
+    if (newTheme === getSystemTheme()) {
+      setShouldUseSystemTheme({ shouldUse: true });
+    }
   });
 
   const handleAnimationLevelChange = useLastCallback((e: React.SyntheticEvent<HTMLElement>) => {

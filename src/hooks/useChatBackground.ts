@@ -1,6 +1,6 @@
 import { useRef } from '../lib/teact/teact';
 
-import type { IThemeSettings, ThemeKey } from '../types';
+import type { IThemeSettings, PrivateXThemeKey, ThemeKey } from '../types';
 import type { WallpaperStorageSource } from '../util/wallpaperStorage';
 
 import buildClassName from '../util/buildClassName';
@@ -13,6 +13,7 @@ import backgroundStyles from '../styles/_patternBackground.module.scss';
 
 type ChatBackgroundParams = {
   theme: ThemeKey;
+  privatexTheme?: PrivateXThemeKey;
   wallpaper: IThemeSettings;
   // Previews don't animate: draw the same gradient once on a 2D canvas instead of a live WebGL renderer.
   isStatic?: boolean;
@@ -24,16 +25,17 @@ type ChatBackgroundParams = {
 // canvas that `Main` and the preview modals all render identically.
 export default function useChatBackground({
   theme,
+  privatexTheme,
   wallpaper,
   isStatic,
   source,
 }: ChatBackgroundParams) {
-  const selectedModel = buildWallpaperRenderModel(theme, wallpaper);
+  const selectedModel = buildWallpaperRenderModel(theme, wallpaper, privatexTheme);
   const customBackgroundValue = useCustomBackground(
     theme, selectedModel.customBackground, selectedModel.isPattern, source,
   );
   const model = source === 'lockScreen' && selectedModel.customBackground && !customBackgroundValue
-    ? buildWallpaperRenderModel(theme, {})
+    ? buildWallpaperRenderModel(theme, {}, privatexTheme)
     : selectedModel;
   const hasGradient = !model.isImage && model.colors.length >= 2;
   const wasMaskedPatternRef = useRef(model.isMaskedPattern);

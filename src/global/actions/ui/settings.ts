@@ -52,9 +52,9 @@ addCallback((global: GlobalState) => {
     });
   }
 
-  if (sharedSettings.theme !== oldSharedSettings.theme) {
+  if (sharedSettings.privatexTheme !== oldSharedSettings.privatexTheme) {
     const withAnimation = document.hasFocus() ? selectCanAnimateInterface(global) : false;
-    switchTheme(sharedSettings.theme, withAnimation);
+    switchTheme(sharedSettings.privatexTheme, withAnimation);
   }
 
   if (sharedSettings.language !== oldSharedSettings.language) {

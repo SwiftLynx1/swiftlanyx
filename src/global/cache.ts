@@ -51,6 +51,7 @@ import { hasStoredSession } from '../util/sessions';
 import { getSystemTheme } from '../util/systemTheme';
 import { getDefaultPatternColor } from '../util/wallpaper';
 import { migrateLegacyWallpaperBlobs, prefetchWallpaperUrl } from '../util/wallpaperStorage';
+import { getPrivateXThemeForScheme } from '../privatex/themes/themes';
 import { buildPageAudioById } from './helpers/buildPageAudioById';
 import { selectSharedSettings } from './selectors/sharedState';
 import { selectThreadInfo } from './selectors/threads';
@@ -286,6 +287,16 @@ export function migrateSharedCache(
         performance,
         themes: cachedSettings?.themes
           || (fallbackThemes ? cloneThemeSettings(fallbackThemes) : initialState.settings.themes),
+      },
+    };
+  }
+
+  if (cachedSettings && !cachedSettings.privatexTheme) {
+    migrated = {
+      ...migrated,
+      settings: {
+        ...migrated.settings,
+        privatexTheme: getPrivateXThemeForScheme(cachedSettings.theme),
       },
     };
   }

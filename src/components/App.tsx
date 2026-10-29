@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect } from '../lib/teact/teact';
 import { withGlobal } from '../global';
 
 import type { GlobalState } from '../global/types';
-import type { ThemeKey } from '../types';
+import type { PrivateXThemeKey, ThemeKey } from '../types';
 import type { UiLoaderPage } from './common/UiLoader';
 
 import {
@@ -10,7 +10,7 @@ import {
 } from '../config';
 import { forceMutation } from '../lib/fasterdom/stricterdom.ts';
 import {
-  selectActionMessageBg, selectTabState, selectTheme, selectThemeValues,
+  selectActionMessageBg, selectPrivateXTheme, selectTabState, selectTheme, selectThemeValues,
 } from '../global/selectors';
 import { IS_TAURI } from '../util/browser/globalEnvironment';
 import { IS_INSTALL_PROMPT_SUPPORTED, PLATFORM_ENV } from '../util/browser/windowEnvironment';
@@ -53,6 +53,7 @@ type StateProps = {
   hasWebAuthTokenFailed?: boolean;
   isTestServer?: boolean;
   theme: ThemeKey;
+  privatexTheme: PrivateXThemeKey;
   customBackgroundColor?: string;
   actionMessageBg?: string;
 };
@@ -75,6 +76,7 @@ const App = ({
   hasWebAuthTokenFailed,
   isTestServer,
   theme,
+  privatexTheme,
   customBackgroundColor,
   actionMessageBg,
 }: StateProps) => {
@@ -245,9 +247,9 @@ const App = ({
     // thumbnail), so service chips don't keep the previous wallpaper's tint.
     document.body.style.setProperty(
       '--action-message-bg',
-      actionMessageBg || getActionMessageBg(theme)!,
+      actionMessageBg || getActionMessageBg(theme, undefined, privatexTheme)!,
     );
-  }, [actionMessageBg, theme]);
+  }, [actionMessageBg, theme, privatexTheme]);
 
   const getIsInBackgroundLocal = getIsInBackground;
   useSignalEffect(() => {
@@ -281,6 +283,7 @@ export default withGlobal(
   (global): Complete<StateProps> => {
     const { state: authState, hasWebAuthTokenFailed, hasWebAuthTokenPasswordRequired } = global.auth;
     const theme = selectTheme(global);
+    const privatexTheme = selectPrivateXTheme(global);
     const themeValues = selectThemeValues(global, theme);
 
     return {
@@ -290,7 +293,8 @@ export default withGlobal(
       inactiveReason: selectTabState(global).inactiveReason,
       hasWebAuthTokenFailed: hasWebAuthTokenFailed || hasWebAuthTokenPasswordRequired,
       theme,
-      customBackgroundColor: getWallpaperBaseColor(theme, themeValues || {}),
+      privatexTheme,
+      customBackgroundColor: getWallpaperBaseColor(theme, themeValues || {}, privatexTheme),
       isTestServer: global.config?.isTestServer,
       actionMessageBg: selectActionMessageBg(global),
     };

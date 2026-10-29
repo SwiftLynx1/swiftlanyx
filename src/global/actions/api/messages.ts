@@ -69,6 +69,8 @@ import { formatStarsAsText } from '../../../util/localization/format';
 import { debounce, onTickEnd, rafPromise } from '../../../util/schedulers';
 import { getServerTime } from '../../../util/serverTime';
 import { callApi, cancelApiProgress } from '../../../api/gramjs';
+import { removeDeletedMessages } from '../../../privatex/antiDelete/deletedMessagesVault';
+import { fetchRestorableDeletedMessages } from '../../../privatex/antiDelete/restoreDeletedMessages';
 import {
   getIsSavedDialog,
   getUserFullName,
@@ -1293,18 +1295,31 @@ addActionHandler('deleteMessages', (global, actions, payload): ActionReturnType 
   }
   const { chatId, threadId } = messageList;
   const chat = selectChat(global, chatId)!;
-  const messageIdsToDelete = messageIds.filter((id) => {
+  const deletionChatId = isChatChannel(chat) || isChatSuperGroup(chat) ? chatId : undefined;
+
+  // Messages kept by Anti-Delete no longer exist on the server
+  const preservedIds = messageIds.filter((id) => selectChatMessage(global, chatId, id)?.remoteDeletedAt);
+  if (preservedIds.length) {
+    void removeDeletedMessages(global.currentUserId!, chatId, preservedIds);
+    deleteMessages(global, deletionChatId, preservedIds, actions);
+    global = getGlobal();
+  }
+
+  const serverMessageIds = preservedIds.length ? messageIds.filter((id) => !preservedIds.includes(id)) : messageIds;
+  const messageIdsToDelete = serverMessageIds.filter((id) => {
     const message = selectChatMessage(global, chatId, id);
     return message && !isMessageLocal(message);
   });
 
   // Only local messages
-  if (!messageIdsToDelete.length && messageIds.length) {
-    deleteMessages(global, isChatChannel(chat) || isChatSuperGroup(chat) ? chatId : undefined, messageIds, actions);
+  if (!messageIdsToDelete.length && serverMessageIds.length) {
+    deleteMessages(global, deletionChatId, serverMessageIds, actions);
     return;
   }
 
-  void callApi('deleteMessages', { chat, messageIds: messageIdsToDelete, shouldDeleteForAll });
+  if (messageIdsToDelete.length) {
+    void callApi('deleteMessages', { chat, messageIds: messageIdsToDelete, shouldDeleteForAll });
+  }
 
   const editingId = selectEditingId(global, chatId, threadId);
   if (editingId && messageIds.includes(editingId)) {
@@ -2304,6 +2319,8 @@ async function loadViewportMessages<T extends GlobalState>(
     messages, count, topics,
   } = result;
 
+  const restoredMessages = await fetchRestorableDeletedMessages(global, chatId, threadId, messages);
+
   global = getGlobal();
 
   const localTypingDrafts = selectThreadLocalStateParam(global, chatId, threadId, 'typingDraftIdByRandomId');
@@ -2313,7 +2330,7 @@ async function loadViewportMessages<T extends GlobalState>(
   const localMessages = chatId === SERVICE_NOTIFICATIONS_USER_ID
     ? global.serviceNotifications.filter(({ isDeleted }) => !isDeleted).map(({ message }) => message)
     : typingDraftMessages;
-  const allMessages = ([] as ApiMessage[]).concat(messages, localMessages);
+  const allMessages = ([] as ApiMessage[]).concat(messages, localMessages, restoredMessages);
   const byId = buildCollectionByKey(allMessages, 'id');
   const ids = Object.keys(byId).map(Number);
 

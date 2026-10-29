@@ -110,6 +110,8 @@ import type {
   PlaybackItemRef,
   PlaybackSource,
   Point,
+  PrivateXSettings,
+  PrivateXThemeKey,
   ProfileTabType,
   RepeatMode,
   ResaleGiftsFilterOptions,
@@ -220,6 +222,8 @@ export interface ActionPayloads {
 
   // settings
   setSettingOption: Partial<AccountSettings> | undefined;
+  setPrivateXSettings: Partial<PrivateXSettings>;
+  clearDeletedMessagesArchive: undefined;
   setSharedSettingOption: Partial<SharedState['settings']> | undefined;
   updatePerformanceSettings: Partial<PerformanceType>;
   loadPasswordInfo: undefined;
@@ -311,6 +315,8 @@ export interface ActionPayloads {
   };
   loadNotificationExceptions: undefined;
   setThemeSettings: { theme: ThemeKey } & Partial<IThemeSettings>;
+  setPrivateXTheme: { themeKey: PrivateXThemeKey };
+  setShouldUseSystemTheme: { shouldUse: boolean };
   animateMessageSending: { chatId: string; threadId: ThreadId; tabId: number };
   updateIsOnline: { isOnline: boolean };
 

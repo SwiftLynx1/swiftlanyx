@@ -123,6 +123,17 @@ const SettingsMain = ({
           </ListItem>
 
           <ListItem
+            icon="eye-crossed"
+            iconBg="purple"
+            multiline
+            narrow
+            onClick={() => openSettingsScreen({ screen: SettingsScreens.PrivateX })}
+          >
+            <span className="title">{lang('PrivateXSettings')}</span>
+            <span className="subtitle">{lang('PrivateXSettingsDesc')}</span>
+          </ListItem>
+
+          <ListItem
             icon="notifications-filled"
             iconBg="red"
             multiline

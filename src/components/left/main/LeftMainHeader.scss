@@ -131,6 +131,10 @@
     margin-left: 0.5rem;
   }
 
+  .ghost-mode-button {
+    color: var(--color-px-ghost, var(--color-primary));
+  }
+
   .StatusButton {
     .emoji-status-effect {
       top: 50%;

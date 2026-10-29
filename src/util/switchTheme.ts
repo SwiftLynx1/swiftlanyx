@@ -1,16 +1,25 @@
-import type { ThemeKey } from '../types';
+import type { PrivateXThemeKey, ThemeKey } from '../types';
 
-import { buildColor, mixColors, serializeColor } from '../lib/color';
+import { buildColor, type Color, mixColors, serializeColor } from '../lib/color';
 import { requestMutation } from '../lib/fasterdom/fasterdom';
+import { PRIVATEX_PALETTES, type ThemeVariable } from '../privatex/themes/palettes';
+import { PRIVATEX_THEME_KEYS, PRIVATEX_THEMES } from '../privatex/themes/themes';
 import themeColors from '../styles/themes.json';
 import { animate } from './animation';
 import { convertSrgbChannel } from './colors.ts';
 
+type ResolvedColors = Map<ThemeVariable, Color>;
+
 let isInitialized = false;
+let appliedThemeKey: PrivateXThemeKey | undefined;
+let appliedColors: ResolvedColors | undefined;
+let animationId = 0;
 
 const DURATION_MS = 200;
 const ENABLE_ANIMATION_DELAY_MS = 500;
-const RGB_VARIABLES = new Set([
+const SCHEME_CLASS_NAMES = ['theme-light', 'theme-dark'];
+const VARIANT_CLASS_NAMES = PRIVATEX_THEME_KEYS.map((key) => PRIVATEX_THEMES[key].className);
+const RGB_VARIABLES = new Set<string>([
   '--color-text',
   '--color-primary-shade',
   '--color-text-secondary',
@@ -24,10 +33,8 @@ const DISABLE_ANIMATION_CSS = `
   transition: none !important;
 }`;
 
-const colors = (Object.keys(themeColors) as Array<keyof typeof themeColors>).map((property) => ({
-  property,
-  colors: [buildColor(themeColors[property][0]), buildColor(themeColors[property][1])],
-}));
+const variables = Object.keys(themeColors) as ThemeVariable[];
+const resolvedCache = new Map<PrivateXThemeKey, ResolvedColors>();
 
 const injectCss = (css: string) => {
   const style = document.createElement('style');
@@ -38,29 +45,33 @@ const injectCss = (css: string) => {
   };
 };
 
-const switchTheme = (theme: ThemeKey, withAnimation: boolean) => {
-  const themeClassName = `theme-${theme}`;
-  if (document.documentElement.classList.contains(themeClassName)) {
+const switchTheme = (themeKey: PrivateXThemeKey, withAnimation: boolean) => {
+  if (themeKey === appliedThemeKey) {
     return;
   }
-  const isDarkTheme = theme === 'dark';
+
+  const theme = PRIVATEX_THEMES[themeKey];
   const shouldAnimate = isInitialized && withAnimation;
-  const startIndex = isDarkTheme ? 0 : 1;
-  const endIndex = isDarkTheme ? 1 : 0;
+  const endColors = resolveColors(themeKey);
   const startAt = Date.now();
   const themeColorTag = document.querySelector('meta[name="theme-color"]');
+  const currentAnimationId = ++animationId;
+
+  appliedThemeKey = themeKey;
 
   requestMutation(() => {
-    document.documentElement.classList.remove(`theme-${isDarkTheme ? 'light' : 'dark'}`);
+    // Read here so an interrupted animation continues from its last rendered frame
+    const startColors = appliedColors;
+    const { classList } = document.documentElement;
+    classList.remove(...SCHEME_CLASS_NAMES, ...VARIANT_CLASS_NAMES);
+
     let uninjectCss: (() => void) | undefined;
     if (isInitialized) {
       uninjectCss = injectCss(DISABLE_ANIMATION_CSS);
-      document.documentElement.classList.add('no-animations');
+      classList.add('no-animations');
     }
-    document.documentElement.classList.add(themeClassName);
-    if (themeColorTag) {
-      themeColorTag.setAttribute('content', isDarkTheme ? '#212121' : '#fff');
-    }
+    classList.add(`theme-${theme.scheme}`, theme.className);
+    themeColorTag?.setAttribute('content', theme.metaColor);
 
     setTimeout(() => {
       requestMutation(() => {
@@ -71,37 +82,64 @@ const switchTheme = (theme: ThemeKey, withAnimation: boolean) => {
 
     isInitialized = true;
 
-    if (shouldAnimate) {
+    if (shouldAnimate && startColors) {
       animate(() => {
+        if (currentAnimationId !== animationId) return false;
+
         const t = Math.min((Date.now() - startAt) / DURATION_MS, 1);
 
-        applyColorAnimationStep(startIndex, endIndex, transition(t));
+        applyColorAnimationStep(startColors, endColors, transition(t));
 
         return t < 1;
       }, requestMutation);
     } else {
-      applyColorAnimationStep(startIndex, endIndex);
+      applyColorAnimationStep(endColors, endColors);
     }
   });
 };
+
+function resolveColors(themeKey: PrivateXThemeKey): ResolvedColors {
+  const cached = resolvedCache.get(themeKey);
+  if (cached) return cached;
+
+  const schemeIndex = getSchemeIndex(PRIVATEX_THEMES[themeKey].scheme);
+  const palette = PRIVATEX_PALETTES[themeKey];
+  const colors: ResolvedColors = new Map(variables.map((property) => [
+    property,
+    buildColor(palette[property] ?? themeColors[property][schemeIndex]),
+  ]));
+
+  resolvedCache.set(themeKey, colors);
+  return colors;
+}
+
+// `themes.json` stores `[light, dark]` pairs
+function getSchemeIndex(scheme: ThemeKey) {
+  return scheme === 'dark' ? 1 : 0;
+}
 
 function transition(t: number) {
   return 1 - ((1 - t) ** 3.5);
 }
 
-function applyColorAnimationStep(startIndex: number, endIndex: number, interpolationRatio: number = 1) {
-  colors.forEach(({ property, colors: propertyColors }) => {
-    const color = mixColors(propertyColors[startIndex], propertyColors[endIndex], interpolationRatio, {
+function applyColorAnimationStep(startColors: ResolvedColors, endColors: ResolvedColors, interpolationRatio = 1) {
+  const nextColors: ResolvedColors = new Map();
+
+  variables.forEach((property) => {
+    const color = mixColors(startColors.get(property)!, endColors.get(property)!, interpolationRatio, {
       space: 'srgb',
     });
     const [r, g, b] = color.coords.map(convertSrgbChannel);
 
+    nextColors.set(property, color);
     document.documentElement.style.setProperty(property, serializeColor(color, { format: 'rgb' }));
 
     if (RGB_VARIABLES.has(property)) {
       document.documentElement.style.setProperty(`${property}-rgb`, `${r},${g},${b}`);
     }
   });
+
+  appliedColors = nextColors;
 }
 
 export default switchTheme;

@@ -134,6 +134,8 @@ import {
   resolveMessageApiChatId,
 } from '../helpers/misc';
 import localDb from '../localDb';
+import { getGhostModeSettings } from '../privatex/ghostMode';
+import { registerOwnDeletions, unregisterOwnDeletions } from '../privatex/ownDeletions';
 import { sendApiUpdate } from '../updates/apiUpdateEmitter';
 import { processMessageAndUpdateThreadInfo } from '../updates/entityProcessor';
 import { processAffectedHistory, updateChannelState } from '../updates/updateManager';
@@ -1439,6 +1441,8 @@ export async function deleteMessages({
   chat: ApiChat; messageIds: number[]; shouldDeleteForAll?: boolean;
 }) {
   const isChannel = getEntityTypeById(chat.id) === 'channel';
+  const ownDeletionChannelId = isChannel ? chat.id : undefined;
+  registerOwnDeletions(ownDeletionChannelId, messageIds);
 
   const result = await invokeRequest(
     isChannel
@@ -1453,6 +1457,7 @@ export async function deleteMessages({
   );
 
   if (!result) {
+    unregisterOwnDeletions(ownDeletionChannelId, messageIds);
     return;
   }
 
@@ -1691,6 +1696,9 @@ export async function markMessageListRead({
 }: {
   chat: ApiChat; threadId: ThreadId; maxId?: number;
 }) {
+  // Ghost Mode reads chats only locally, and the chat refresh below would restore the server unread counter
+  if (getGhostModeSettings().shouldHideReadReceipts) return undefined;
+
   const isChannel = getEntityTypeById(chat.id) === 'channel';
 
   if (isChannel && threadId === MAIN_THREAD_ID) {

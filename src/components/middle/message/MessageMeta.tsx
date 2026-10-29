@@ -136,6 +136,12 @@ const MessageMeta = ({
     return lang('MessageTooltipReplies', { count }, { pluralValue: count });
   }, [lang, repliesThreadInfo]);
 
+  const deletedTitle = useMemo(() => {
+    if (!message.remoteDeletedAt) return undefined;
+    const date = formatDateTime(lang, secondsToDate(message.remoteDeletedAt), { date: 'short', time: 'short' });
+    return lang('PrivateXMessageDeletedAt', { date });
+  }, [lang, message.remoteDeletedAt]);
+
   const shouldShowPrimaryEditedDate = Boolean(message.isEdited && isMessagePrimaryEditedDateEnabled);
 
   const date = useMemo(() => {
@@ -208,6 +214,11 @@ const MessageMeta = ({
               asFont: true,
             })
           }
+        </span>
+      )}
+      {deletedTitle && (
+        <span className="message-deleted" title={deletedTitle}>
+          <Icon name="delete" />
         </span>
       )}
       <span className="message-time" title={dateTitle} onMouseEnter={markActivated}>

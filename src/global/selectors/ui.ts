@@ -78,13 +78,17 @@ export function selectTheme<T extends GlobalState>(global: T) {
   return selectSharedSettings(global).theme;
 }
 
+export function selectPrivateXTheme<T extends GlobalState>(global: T) {
+  return selectSharedSettings(global).privatexTheme;
+}
+
 export function selectThemeValues<T extends GlobalState>(global: T, themeKey: ThemeKey) {
   return selectSharedSettings(global).themes[themeKey];
 }
 
 export function selectActionMessageBg<T extends GlobalState>(global: T) {
   const theme = selectTheme(global);
-  return getActionMessageBgMemo(theme, selectThemeValues(global, theme));
+  return getActionMessageBgMemo(theme, selectThemeValues(global, theme), selectPrivateXTheme(global));
 }
 
 export function selectIsForumPanelOpen<T extends GlobalState>(

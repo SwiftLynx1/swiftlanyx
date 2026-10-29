@@ -32,6 +32,15 @@ export interface ApiInitialArgs {
   isTestServerRequested?: boolean;
   accountIds?: string[];
   hasPasskeySupport?: boolean;
+  ghostMode?: ApiGhostModeSettings;
+}
+
+export interface ApiGhostModeSettings {
+  shouldHideReadReceipts?: boolean;
+  shouldHideStoryViews?: boolean;
+  shouldHideMediaPlayback?: boolean;
+  shouldHideOnline?: boolean;
+  shouldHideTyping?: boolean;
 }
 
 export type ApiPasskeyOption = {

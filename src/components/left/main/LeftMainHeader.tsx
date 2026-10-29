@@ -15,6 +15,7 @@ import {
   selectTabState,
   selectTheme,
 } from '../../../global/selectors';
+import { selectSettingsKeys } from '../../../global/selectors/settings';
 import { selectSharedSettings } from '../../../global/selectors/sharedState';
 import { IS_TAURI } from '../../../util/browser/globalEnvironment';
 import { IS_APP, IS_MAC_OS } from '../../../util/browser/windowEnvironment';
@@ -63,6 +64,7 @@ type StateProps = {
   areChatsLoaded?: boolean;
   hasPasscode?: boolean;
   canSetPasscode?: boolean;
+  isGhostModeEnabled?: boolean;
   isForumPanelOpen?: boolean;
 } & Pick<GlobalState, 'connectionState' | 'isSyncing' | 'isFetchingDifference'>;
 
@@ -90,6 +92,7 @@ const LeftMainHeader = ({
   isConnectionStatusMinimized,
   areChatsLoaded,
   hasPasscode,
+  isGhostModeEnabled,
   canSetPasscode,
   isFoldersSidebarShown,
   isForumPanelOpen,
@@ -188,6 +191,10 @@ const LeftMainHeader = ({
 
   const handleLockScreen = useLastCallback(() => {
     lockScreen();
+  });
+
+  const handleOpenPrivateXSettings = useLastCallback(() => {
+    openSettingsScreen({ screen: SettingsScreens.PrivateX });
   });
 
   const handleSearchEnter = useLastCallback(() => {
@@ -297,6 +304,18 @@ const LeftMainHeader = ({
             iconName="unlock"
           />
         )}
+        {isGhostModeEnabled && (
+          <Button
+            round
+            ripple={!isMobile}
+            size="smaller"
+            color="translucent"
+            ariaLabel={lang('PrivateXGhostModeActive')}
+            onClick={handleOpenPrivateXSettings}
+            className={buildClassName('ghost-mode-button', !isCurrentUserPremium && !hasPasscode && 'extra-spacing')}
+            iconName="eye-crossed"
+          />
+        )}
         <ShowTransition
           isOpen={connectionStatusPosition === 'overlay'}
           isCustom
@@ -340,6 +359,7 @@ export default memo(withGlobal<OwnProps>(
       isCurrentUserPremium: selectIsCurrentUserPremium(global),
       areChatsLoaded: Boolean(global.chats.listIds.active),
       hasPasscode: Boolean(global.passcode.hasPasscode),
+      isGhostModeEnabled: selectSettingsKeys(global).isGhostModeEnabled,
       canSetPasscode: selectCanSetPasscode(global),
       isForumPanelOpen,
     };

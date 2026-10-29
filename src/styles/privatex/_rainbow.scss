@@ -1,0 +1,47 @@
+@use "mixins" as px;
+
+$rainbow-ring: conic-gradient(#D6246E, #F59E0B, #10B981, #2563EB, #7B3FE4, #D6246E);
+$rainbow-bar: linear-gradient(90deg, #D6246E, #F59E0B, #10B981, #2563EB, #7B3FE4);
+
+html.theme-rainbow {
+  --color-px-deleted-icon: #EF7A8A;
+  --color-px-ghost: #A78BFA;
+
+  @include px.incoming-bubble(#1A1A21);
+  @include px.own-bubble-fill(linear-gradient(135deg, #D6246E, #7B3FE4 55%, #2563EB));
+
+  .Chat.selected:not(.forum) .ListItem-button {
+    background-image: linear-gradient(90deg, #D6246E, #7B3FE4 60%, #2563EB);
+  }
+
+  .main-button::before {
+    pointer-events: none;
+    content: "";
+
+    position: absolute;
+    inset: -0.1875rem;
+
+    border-radius: 50%;
+
+    background: $rainbow-ring;
+
+    mask-image: radial-gradient(farthest-side, transparent calc(100% - 0.125rem), #000 calc(100% - 0.0625rem));
+  }
+
+  .RangeSlider .slider-fill-track,
+  .Audio .seekline-play-progress {
+    background: $rainbow-bar;
+  }
+
+  @include px.ambient {
+    .main-button::before {
+      animation: px-spin 6s linear infinite;
+    }
+  }
+}
+
+@keyframes px-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}

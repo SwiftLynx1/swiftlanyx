@@ -831,6 +831,7 @@ const Message = ({
     isFocused && !noFocusHighlight && 'focused',
     isForwarding && 'is-forwarding',
     isPlayingDeleteAnimation && 'is-deleting',
+    Boolean(message.remoteDeletedAt) && 'is-deleted-remotely',
     isPlayingSnapAnimation && 'is-dissolving',
     isInDocumentGroup && 'is-in-document-group',
     isAlbum && 'is-album',

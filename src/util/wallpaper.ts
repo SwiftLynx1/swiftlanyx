@@ -1,9 +1,10 @@
 import { decompressSync } from 'fflate';
 
 import type { ApiWallpaper, ApiWallpaperSettings } from '../api/types';
-import type { IThemeSettings, ThemeKey } from '../types';
+import type { IThemeSettings, PrivateXThemeKey, ThemeKey } from '../types';
 
 import { DARK_THEME_BG_COLOR } from '../config';
+import { PRIVATEX_WALLPAPERS } from '../privatex/themes/wallpapers';
 import { buildColorFromHex, buildDenseTint, getPatternColor } from './colors';
 import int2hex from './int2hex';
 
@@ -21,6 +22,8 @@ export type DefaultWallpaper = {
   colors: string[];
   patternColor: string;
   intensity: number;
+  baseColor?: string;
+  actionMessageBg?: string;
 };
 
 export type WallpaperRenderModel = {
@@ -73,7 +76,9 @@ export function getIsMaskedPattern(isPattern?: boolean, patternIntensity?: numbe
   return Boolean(isPattern) && (patternIntensity ?? 0) < 0;
 }
 
-export function buildWallpaperRenderModel(theme: ThemeKey, settings: IThemeSettings): WallpaperRenderModel {
+export function buildWallpaperRenderModel(
+  theme: ThemeKey, settings: IThemeSettings, privatexTheme?: PrivateXThemeKey,
+): WallpaperRenderModel {
   const {
     background: customBackground,
     backgroundColor,
@@ -92,7 +97,7 @@ export function buildWallpaperRenderModel(theme: ThemeKey, settings: IThemeSetti
   ].filter(Boolean);
   const isImage = Boolean(customBackground) && !isPattern;
   const isDefault = getIsDefaultWallpaper(settings);
-  const defaultWallpaper = getDefaultWallpaper(theme);
+  const defaultWallpaper = getDefaultWallpaper(theme, privatexTheme);
   const effectivePatternColor = isDefault ? defaultWallpaper.patternColor : patternColor;
   const effectivePatternIntensity = isDefault ? defaultWallpaper.intensity : patternIntensity;
   const isCustomPattern = Boolean(isPattern) && Boolean(customBackground);
@@ -113,7 +118,7 @@ export function buildWallpaperRenderModel(theme: ThemeKey, settings: IThemeSetti
     backgroundRotation,
     patternColor: effectivePatternColor,
     patternIntensity: scaledPatternIntensity,
-    baseColor: getWallpaperBaseColor(theme, settings),
+    baseColor: getWallpaperBaseColor(theme, settings, privatexTheme),
     isImage,
     isBlurred: Boolean(isBlurred),
     isDefault,
@@ -122,15 +127,17 @@ export function buildWallpaperRenderModel(theme: ThemeKey, settings: IThemeSetti
   };
 }
 
-export function getWallpaperBaseColor(theme: ThemeKey, settings: IThemeSettings): string | undefined {
+export function getWallpaperBaseColor(
+  theme: ThemeKey, settings: IThemeSettings, privatexTheme?: PrivateXThemeKey,
+): string | undefined {
   const isDefault = getIsDefaultWallpaper(settings);
-  const defaultWallpaper = getDefaultWallpaper(theme);
+  const defaultWallpaper = getDefaultWallpaper(theme, privatexTheme);
   const patternIntensity = isDefault ? defaultWallpaper.intensity : settings.patternIntensity;
   const isCustomPattern = Boolean(settings.isPattern && settings.background);
   const isMaskedPattern = getIsMaskedPattern(isCustomPattern || isDefault, patternIntensity);
 
   return isMaskedPattern
-    ? DARK_THEME_BG_COLOR
+    ? (isDefault && defaultWallpaper.baseColor) || DARK_THEME_BG_COLOR
     : (settings.backgroundColor || (isDefault ? defaultWallpaper.colors[0] : undefined));
 }
 
@@ -165,9 +172,12 @@ export function getDefaultPatternColor(theme: ThemeKey): string {
 
 // Built-in wallpapers use their stable chip colors; custom wallpapers follow their derived tint.
 // The tint is densified against the wallpaper's average color to hide the doodles beneath the chips.
-export function getActionMessageBg(theme: ThemeKey, settings?: IThemeSettings): string | undefined {
-  const model = buildWallpaperRenderModel(theme, settings || {});
-  const defaultTint = theme === 'dark' ? DEFAULT_DARK_ACTION_MESSAGE_BG : DEFAULT_LIGHT_ACTION_MESSAGE_BG;
+export function getActionMessageBg(
+  theme: ThemeKey, settings?: IThemeSettings, privatexTheme?: PrivateXThemeKey,
+): string | undefined {
+  const model = buildWallpaperRenderModel(theme, settings || {}, privatexTheme);
+  const defaultTint = getDefaultWallpaper(theme, privatexTheme).actionMessageBg
+    || (theme === 'dark' ? DEFAULT_DARK_ACTION_MESSAGE_BG : DEFAULT_LIGHT_ACTION_MESSAGE_BG);
   const tint = model.isDefault ? defaultTint : model.patternColor;
   if (!tint) return undefined;
 
@@ -258,7 +268,9 @@ export function buildThemeSettingsFromWallpaper(wallpaper: ApiWallpaper): Partia
   };
 }
 
-function getDefaultWallpaper(theme: ThemeKey) {
+function getDefaultWallpaper(theme: ThemeKey, privatexTheme?: PrivateXThemeKey): DefaultWallpaper {
+  if (privatexTheme) return PRIVATEX_WALLPAPERS[privatexTheme];
+
   return theme === 'dark' ? DEFAULT_DARK_WALLPAPER : DEFAULT_LIGHT_WALLPAPER;
 }
 

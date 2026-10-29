@@ -1,0 +1,57 @@
+// Decorative infinite animations run only at the highest animation level and without `prefers-reduced-motion`
+@mixin ambient {
+  @media (prefers-reduced-motion: no-preference) {
+    body:not(.no-right-column-animations) {
+      @content;
+    }
+  }
+}
+
+// Backdrop blur follows the app's "menu blur" performance setting
+@mixin glass($background, $blur: 0.75rem) {
+  body:not(.no-menu-blur) & {
+    background-color: $background;
+    backdrop-filter: blur($blur) saturate(140%);
+  }
+}
+
+@mixin hairline-surfaces($color) {
+  --shadow-island: 0 0 0 0.0625rem #{$color};
+  --shadow-pane: 0 0 0 0.0625rem #{$color};
+  --shadow-footer: 0 0 0 0.0625rem #{$color};
+  --shadow-chat-list-panel: 0 0 0 0.0625rem #{$color};
+}
+
+@mixin incoming-bubble($color) {
+  .Message:not(.own):not(.is-story-mention) {
+    --background-color: #{$color};
+  }
+}
+
+@mixin own-bubble-fill($fill) {
+  .Message.own .message-content.has-solid-background {
+    background: $fill;
+  }
+}
+
+// Absolutely positioned decoration inside the chat area, painted under the messages
+@mixin chat-decoration {
+  pointer-events: none;
+  content: "";
+  position: absolute;
+  z-index: -1;
+}
+
+// Inverts text drawn with `--color-white` on surfaces filled with a light `--color-primary`
+@mixin ink-on-primary($ink) {
+  .Button.primary,
+  .Checkbox,
+  .Chat {
+    --color-white: #{$ink};
+  }
+
+  .Tab__badge--active,
+  #auth-qr-form ol li::before {
+    color: $ink;
+  }
+}

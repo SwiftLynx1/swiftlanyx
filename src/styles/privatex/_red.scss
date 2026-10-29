@@ -1,0 +1,43 @@
+@use "mixins" as px;
+
+html.theme-red {
+  --color-px-deleted-icon: #E8808F;
+  --color-px-ghost: #FF6B8A;
+  --border-radius-messages: 0.4375rem;
+  --border-radius-messages-small: 0.1875rem;
+  --border-radius-button: 0.5rem;
+  --border-radius-button-tiny: 0.375rem;
+  --border-radius-modal: 0.75rem;
+  --border-radius-menu: 0.5rem;
+  --border-radius-list-item: 0.5rem;
+  --border-radius-toast: 0.5rem;
+  --border-radius-island: 0.5rem;
+  --border-radius-pane: 0.5rem;
+  --border-radius-default: 0.5rem;
+  --border-radius-default-small: 0.375rem;
+  --border-radius-default-tiny: 0.25rem;
+
+  @include px.hairline-surfaces(#2A171D);
+  @include px.incoming-bubble(#1B1214);
+  @include px.own-bubble-fill(linear-gradient(135deg, #9F1239, #BE123C));
+
+  .MiddleHeader {
+    border-radius: var(--border-radius-pane);
+  }
+
+  .Chat.selected:not(.forum) .ListItem-button {
+    background-image: linear-gradient(to right, #E11D48 0.1875rem, transparent 0.1875rem);
+  }
+
+  .messages-layout::after {
+    @include px.chat-decoration;
+
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 55%, #7A0F2847 100%);
+  }
+}
+
+html.theme-red body.is-ios {
+  --border-radius-messages: 0.4375rem;
+  --border-radius-messages-small: 0.1875rem;
+}

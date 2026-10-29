@@ -1,0 +1,75 @@
+@use "mixins" as px;
+
+$snow-tile: 32rem;
+
+html.theme-winter {
+  --color-px-deleted-icon: #F08A93;
+  --color-px-ghost: #7DD3FC;
+
+  @include px.incoming-bubble(#12233A);
+  @include px.own-bubble-fill(linear-gradient(135deg, #1F4FA8, #2F78C8));
+
+  // Frosted glass on the floating header and the composer
+  .MiddleHeader {
+    border: 0.0625rem solid #7DD3FC24;
+
+    @include px.glass(#0E1B2EB8);
+  }
+
+  .composer-wrapper {
+    @include px.glass(#0E1B2EB8);
+  }
+
+  // Static flakes by default; they fall only when ambient animations are allowed
+  .messages-layout::before {
+    @include px.chat-decoration;
+
+    inset: 0;
+    opacity: 0.7;
+    background-image:
+      radial-gradient(circle at 9% 11%, #FFFFFFB3 0 0.125rem, transparent 0.1875rem),
+      radial-gradient(circle at 30% 11%, #FFFFFFCC 0 0.0938rem, transparent 0.1563rem),
+      radial-gradient(circle at 50% 12%, #FFFFFF66 0 0.0938rem, transparent 0.1563rem),
+      radial-gradient(circle at 69% 5%, #FFFFFF66 0 0.1563rem, transparent 0.2188rem),
+      radial-gradient(circle at 91% 9%, #FFFFFFCC 0 0.125rem, transparent 0.1875rem),
+      radial-gradient(circle at 12% 32%, #FFFFFF66 0 0.1563rem, transparent 0.2188rem),
+      radial-gradient(circle at 24% 26%, #FFFFFFCC 0 0.0938rem, transparent 0.1563rem),
+      radial-gradient(circle at 43% 29%, #FFFFFFCC 0 0.125rem, transparent 0.1875rem),
+      radial-gradient(circle at 75% 30%, #FFFFFFB3 0 0.0938rem, transparent 0.1563rem),
+      radial-gradient(circle at 83% 24%, #FFFFFFB3 0 0.0938rem, transparent 0.1563rem),
+      radial-gradient(circle at 17% 57%, #FFFFFF99 0 0.0625rem, transparent 0.125rem),
+      radial-gradient(circle at 27% 46%, #FFFFFF66 0 0.0938rem, transparent 0.1563rem),
+      radial-gradient(circle at 44% 54%, #FFFFFF66 0 0.125rem, transparent 0.1875rem),
+      radial-gradient(circle at 75% 48%, #FFFFFF66 0 0.0625rem, transparent 0.125rem),
+      radial-gradient(circle at 86% 56%, #FFFFFFB3 0 0.0625rem, transparent 0.125rem),
+      radial-gradient(circle at 8% 73%, #FFFFFF66 0 0.125rem, transparent 0.1875rem),
+      radial-gradient(circle at 31% 66%, #FFFFFF99 0 0.0938rem, transparent 0.1563rem),
+      radial-gradient(circle at 44% 68%, #FFFFFF66 0 0.125rem, transparent 0.1875rem),
+      radial-gradient(circle at 65% 73%, #FFFFFF66 0 0.0625rem, transparent 0.125rem),
+      radial-gradient(circle at 90% 70%, #FFFFFF80 0 0.1563rem, transparent 0.2188rem),
+      radial-gradient(circle at 9% 86%, #FFFFFFB3 0 0.0938rem, transparent 0.1563rem),
+      radial-gradient(circle at 32% 85%, #FFFFFF80 0 0.125rem, transparent 0.1875rem),
+      radial-gradient(circle at 43% 95%, #FFFFFF99 0 0.1563rem, transparent 0.2188rem),
+      radial-gradient(circle at 77% 83%, #FFFFFFB3 0 0.0938rem, transparent 0.1563rem),
+      radial-gradient(circle at 97% 91%, #FFFFFF66 0 0.1563rem, transparent 0.2188rem);
+    background-size: $snow-tile $snow-tile;
+  }
+
+  @include px.ambient {
+    .messages-layout::before {
+      will-change: transform;
+      inset: (-$snow-tile) 0 0;
+      animation: px-snowfall 36s linear infinite;
+    }
+  }
+}
+
+@keyframes px-snowfall {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY($snow-tile);
+  }
+}

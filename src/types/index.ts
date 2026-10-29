@@ -121,6 +121,7 @@ export type ForwardTarget = {
 };
 
 export type ThemeKey = 'light' | 'dark';
+export type PrivateXThemeKey = 'privatexDark' | 'privatexLight' | 'halloween' | 'winter' | 'rainbow' | 'red';
 export type AnimationLevel = 0 | 1 | 2;
 export type FoldersPosition = 'top' | 'left';
 export type PerformanceTypeKey = (
@@ -192,7 +193,18 @@ export interface AccountSettings {
   doNotTranslate: string[];
   translationTone?: TranslationTone;
   shouldPaidMessageAutoApprove: boolean;
+  isGhostModeEnabled: boolean;
+  shouldGhostHideReadReceipts: boolean;
+  shouldGhostHideStoryViews: boolean;
+  shouldGhostHideMediaPlayback: boolean;
+  shouldGhostHideOnline: boolean;
+  shouldGhostHideTyping: boolean;
+  isAntiDeleteEnabled: boolean;
 }
+
+export type PrivateXSettings = Pick<AccountSettings, 'isGhostModeEnabled' | 'shouldGhostHideReadReceipts'
+  | 'shouldGhostHideStoryViews' | 'shouldGhostHideMediaPlayback' | 'shouldGhostHideOnline' | 'shouldGhostHideTyping'
+  | 'isAntiDeleteEnabled'>;
 
 export type IAnchorPosition = {
   x: number;
@@ -311,6 +323,7 @@ export enum SettingsScreens {
   DoNotTranslate,
   FoldersShare,
   Passkeys,
+  PrivateX,
 }
 
 export type StickerSetOrReactionsSetOrRecent = Pick<ApiStickerSet, (

@@ -791,6 +791,8 @@ export interface ApiMessage {
   sendingState?: 'messageSendingStatePending' | 'messageSendingStateFailed';
   forwardInfo?: ApiMessageForwardInfo;
   isDeleting?: boolean;
+  // Server time when another party deleted the message while Anti-Delete kept it locally
+  remoteDeletedAt?: number;
   previousLocalId?: number;
   viewsCount?: number;
   forwardsCount?: number;

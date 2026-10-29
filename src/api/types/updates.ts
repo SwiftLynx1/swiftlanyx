@@ -449,6 +449,8 @@ export type ApiUpdateDeleteMessages = {
   '@type': 'deleteMessages';
   ids: number[];
   chatId?: string;
+  // Subset of `ids` deleted outside of this client
+  remoteIds?: number[];
 };
 
 export type ApiUpdateDeleteScheduledMessages = {

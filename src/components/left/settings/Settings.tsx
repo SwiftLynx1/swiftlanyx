@@ -43,6 +43,7 @@ import SettingsPrivacy from './SettingsPrivacy';
 import SettingsPrivacyBlockedUsers from './SettingsPrivacyBlockedUsers';
 import SettingsPrivacyVisibility from './SettingsPrivacyVisibility';
 import SettingsPrivacyVisibilityExceptionList from './SettingsPrivacyVisibilityExceptionList';
+import SettingsPrivateX from './SettingsPrivateX';
 import SettingsQuickReaction from './SettingsQuickReaction';
 import SettingsStickers from './SettingsStickers';
 import SettingsTwoFa from './twoFa/SettingsTwoFa';
@@ -546,6 +547,11 @@ const Settings = ({
             isActive={isScreenActive}
             onReset={handleReset}
           />
+        );
+
+      case SettingsScreens.PrivateX:
+        return (
+          <SettingsPrivateX isActive={isScreenActive} onReset={handleReset} />
         );
 
       case SettingsScreens.Performance:

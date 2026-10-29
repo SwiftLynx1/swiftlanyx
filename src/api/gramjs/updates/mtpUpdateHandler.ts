@@ -99,6 +99,7 @@ import {
   serializeBytes,
 } from '../helpers/misc';
 import localDb from '../localDb';
+import { filterRemoteDeletionIds } from '../privatex/ownDeletions';
 import { scheduleMutedChatUpdate, scheduleMutedTopicUpdate } from '../scheduleUnmute';
 import { sendApiUpdate } from './apiUpdateEmitter';
 import { processMessageAndUpdateThreadInfo } from './entityProcessor';
@@ -467,6 +468,7 @@ export function updater(update: Update) {
     sendApiUpdate({
       '@type': 'deleteMessages',
       ids: update.messages,
+      remoteIds: filterRemoteDeletionIds(undefined, update.messages),
     });
   } else if (update instanceof GramJs.UpdateDeleteScheduledMessages) {
     sendApiUpdate({
@@ -482,6 +484,7 @@ export function updater(update: Update) {
       '@type': 'deleteMessages',
       ids: update.messages,
       chatId,
+      remoteIds: filterRemoteDeletionIds(chatId, update.messages),
     });
   } else if (update instanceof GramJs.UpdateServiceNotification) {
     if (update.popup) {

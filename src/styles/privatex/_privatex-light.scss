@@ -1,0 +1,29 @@
+@use "mixins" as px;
+
+html.theme-privatex-light {
+  --color-px-deleted-icon: #C2535D;
+  --color-px-ghost: #111317;
+
+  @include px.hairline-surfaces(#E5E7EB);
+
+  .Message:not(.own) .message-content:is(.has-solid-background, .has-background) {
+    box-shadow: 0 0 0 0.0625rem var(--color-borders);
+  }
+
+  // Signature black bubble: text variables are scoped to the bubble so nothing outside it changes
+  .Message.own {
+    --color-text: #FFFFFF;
+    --color-text-rgb: 255, 255, 255;
+    --color-text-secondary: #FFFFFF99;
+    --color-text-secondary-rgb: 255, 255, 255;
+    --color-text-meta: #FFFFFF99;
+    --color-text-meta-rgb: 255, 255, 255;
+    --text-color-reaction-chosen: #111317;
+
+    color: var(--color-text);
+  }
+
+  .Message.own .message-content.has-shadow {
+    box-shadow: none;
+  }
+}

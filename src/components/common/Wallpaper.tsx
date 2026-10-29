@@ -1,9 +1,11 @@
 import type { ElementRef, TeactNode } from '../../lib/teact/teact';
 import { withGlobal } from '../../global';
 
-import type { IThemeSettings, ThemeKey } from '../../types';
+import type { IThemeSettings, PrivateXThemeKey, ThemeKey } from '../../types';
 
-import { selectPerformanceSettingsValue, selectTheme, selectThemeValues } from '../../global/selectors';
+import {
+  selectPerformanceSettingsValue, selectPrivateXTheme, selectTheme, selectThemeValues,
+} from '../../global/selectors';
 import buildClassName from '../../util/buildClassName';
 import buildStyle from '../../util/buildStyle';
 
@@ -29,6 +31,7 @@ type OwnProps = {
 
 type StateProps = {
   theme: ThemeKey;
+  privatexTheme: PrivateXThemeKey;
   canAnimateGradient?: boolean;
   themeSettings?: IThemeSettings;
 };
@@ -50,6 +53,7 @@ const Wallpaper = ({
   backgroundMode,
   onClick,
   theme,
+  privatexTheme,
   canAnimateGradient,
   themeSettings,
 }: OwnProps & StateProps) => {
@@ -59,6 +63,7 @@ const Wallpaper = ({
 
   const background = useChatBackground({
     theme,
+    privatexTheme,
     wallpaper: themeSettings || EMPTY_THEME_SETTINGS,
     isStatic: isStaticGradient,
     source: backgroundMode === 'lockScreen' ? 'lockScreen' : undefined,
@@ -96,6 +101,7 @@ export default withGlobal<OwnProps>(
 
     return {
       theme,
+      privatexTheme: selectPrivateXTheme(global),
       canAnimateGradient: selectPerformanceSettingsValue(global, 'messageSendingAnimations'),
       themeSettings: backgroundMode === 'default' ? EMPTY_THEME_SETTINGS : selectThemeValues(global, theme),
     };

@@ -38,6 +38,8 @@ export * from './calls';
 
 export * from './reactions';
 
+export * from './privatex';
+
 export * from './statistics';
 
 export * from './phoneCallState';

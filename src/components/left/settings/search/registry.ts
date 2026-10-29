@@ -68,6 +68,14 @@ export const SETTINGS_SEARCH_SECTIONS: SettingsSearchSection[] = [
     iconBg: 'orange',
   },
   {
+    screen: SettingsScreens.PrivateX,
+    parent: SettingsScreens.Main,
+    titleKey: 'PrivateXSettings',
+    keywordsKey: 'SettingsKeywordsPrivateX',
+    icon: 'eye-crossed',
+    iconBg: 'purple',
+  },
+  {
     screen: SettingsScreens.Notifications,
     parent: SettingsScreens.Main,
     titleKey: 'Notifications',
@@ -296,6 +304,11 @@ export const SETTINGS_SEARCH_ENTRIES: SettingsSearchEntry[] = [
     keywordsKey: 'SettingsKeywordsLogOut', icon: 'logout', iconBg: 'gray', isInHeaderMenu: true,
   }),
 
+  ...buildEntries(SettingsScreens.PrivateX, [
+    'PrivateXGhostModeEnable', 'PrivateXGhostReadReceipts', 'PrivateXGhostStoryViews', 'PrivateXGhostMediaPlayback',
+    'PrivateXGhostOnline', 'PrivateXGhostTyping', 'PrivateXAntiDeleteEnable', 'PrivateXAntiDeleteClear',
+  ]),
+
   ...buildEntries(SettingsScreens.EditProfile, [
     'FirstName', 'LastName', 'UserBio', 'SettingsBirthday', 'Username', 'PersonalChannelTitle',
   ]),
@@ -304,8 +317,9 @@ export const SETTINGS_SEARCH_ENTRIES: SettingsSearchEntry[] = [
   ...buildEntries(SettingsScreens.General, ['Theme'], { keywordsKey: 'SettingsKeywordsTheme' }),
   ...buildEntries(SettingsScreens.General, ['SettingsTimeFormat'], { keywordsKey: 'SettingsKeywordsTimeFormat' }),
   ...buildEntries(SettingsScreens.General, [
-    'EmptyChatAppearanceLight', 'EmptyChatAppearanceDark', 'EmptyChatAppearanceSystem', 'SettingsTimeFormat12',
-    'SettingsTimeFormat24', 'SettingsAutomaticTextReplacements', 'SettingsKeyboard',
+    'ThemePrivateXDark', 'ThemePrivateXLight', 'ThemeHalloween', 'ThemeWinter', 'ThemeRainbow', 'ThemeRed',
+    'ThemeFollowSystem', 'SettingsTimeFormat12', 'SettingsTimeFormat24', 'SettingsAutomaticTextReplacements',
+    'SettingsKeyboard',
   ]),
   ...buildEntries(SettingsScreens.General, [
     'SettingsSendEnter', IS_MAC_OS || IS_IOS ? 'SettingsSendCmdenter' : 'SettingsSendCtrlenter',

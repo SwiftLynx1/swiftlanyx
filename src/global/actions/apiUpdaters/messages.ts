@@ -25,6 +25,7 @@ import { notifyAboutMessage } from '../../../util/notifications';
 import { onTickEnd } from '../../../util/schedulers';
 import { getServerTime } from '../../../util/serverTime';
 import { callApi } from '../../../api/gramjs';
+import { saveDeletedMessage } from '../../../privatex/antiDelete/deletedMessagesVault';
 import {
   addPaidReaction,
   checkIfHasUnreadReactions,
@@ -41,6 +42,7 @@ import {
   runForAllTabs,
   WINDOWED_MEDIA_SEARCH_TYPES,
 } from '../../helpers';
+import { canPreserveDeletedMessage } from '../../helpers/privatex';
 import { getMessageReplyInfo, getStoryReplyInfo } from '../../helpers/replies';
 import {
   addActionHandler,
@@ -111,6 +113,7 @@ import {
   selectPinnedIds,
   selectScheduledIds,
   selectScheduledMessage,
+  selectSettingsKeys,
   selectTabState,
   selectTopic,
   selectTopicFromMessage,
@@ -987,9 +990,19 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
     }
 
     case 'deleteMessages': {
-      const { ids, chatId } = update;
+      const { ids, chatId, remoteIds } = update;
 
-      deleteMessages(global, chatId, ids, actions);
+      const preservedIds = remoteIds?.length ? preserveDeletedMessages(global, chatId, remoteIds, actions) : undefined;
+      if (!preservedIds?.length) {
+        deleteMessages(global, chatId, ids, actions);
+        break;
+      }
+
+      const idsToDelete = ids.filter((id) => !preservedIds.includes(id));
+      if (idsToDelete.length) {
+        global = getGlobal();
+        deleteMessages(global, chatId, idsToDelete, actions);
+      }
       break;
     }
 
@@ -1794,6 +1807,46 @@ export function deleteMessages<T extends GlobalState>(
   unique(chatIdsToUpdate).forEach((id) => {
     actions.requestChatUpdate({ chatId: id });
   });
+}
+
+/**
+ * Anti-Delete: marks messages deleted by other parties instead of removing them.
+ * Returns the IDs that were kept.
+ */
+function preserveDeletedMessages<T extends GlobalState>(
+  global: T, chatId: string | undefined, ids: number[], actions: RequiredGlobalActions,
+) {
+  const { currentUserId } = global;
+  if (!currentUserId || !selectSettingsKeys(global).isAntiDeleteEnabled) return [];
+
+  const deletedAt = getServerTime();
+  const preservedIds: number[] = [];
+  const chatIdsToUpdate = new Set<string>();
+
+  ids.forEach((id) => {
+    const messageChatId = chatId || selectCommonBoxChatId(global, id);
+    // Deletions in Saved Messages always come from the user's own devices
+    if (!messageChatId || selectIsChatWithSelf(global, messageChatId)) return;
+
+    const message = selectChatMessage(global, messageChatId, id);
+    if (!message || !canPreserveDeletedMessage(message)) return;
+
+    preservedIds.push(id);
+    chatIdsToUpdate.add(messageChatId);
+    if (message.remoteDeletedAt) return;
+
+    global = updateChatMessage(global, messageChatId, id, { remoteDeletedAt: deletedAt });
+    void saveDeletedMessage(currentUserId, selectChatMessage(global, messageChatId, id)!);
+  });
+
+  if (!preservedIds.length) return preservedIds;
+
+  setGlobal(global);
+  chatIdsToUpdate.forEach((id) => {
+    actions.requestChatUpdate({ chatId: id });
+  });
+
+  return preservedIds;
 }
 
 function deleteChatMessagesWithAnimation<T extends GlobalState>(global: T, chatId: string, ids: number[]) {

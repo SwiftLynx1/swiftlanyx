@@ -19,6 +19,7 @@ import switchTheme from '../../../util/switchTheme';
 import { getSystemTheme, setSystemThemeChangeCallback } from '../../../util/systemTheme';
 import { startWebsync, stopWebsync } from '../../../util/websync';
 import { callApi } from '../../../api/gramjs';
+import { getPrivateXThemeForScheme, getPrivateXThemeScheme } from '../../../privatex/themes/themes';
 import { clearCaching, setupCaching } from '../../cache';
 import { addActionHandler, getGlobal, setGlobal } from '../../index';
 import { updateSharedSettings } from '../../reducers';
@@ -29,7 +30,6 @@ import {
   selectPerformanceSettings,
   selectSettingsKeys,
   selectTabState,
-  selectTheme,
 } from '../../selectors';
 import { selectSharedSettings } from '../../selectors/sharedState';
 import { destroySharedStatePort, initSharedState } from '../../shared/sharedStateConnector';
@@ -41,7 +41,7 @@ setSystemThemeChangeCallback((theme) => {
 
   if (!global.isInited || !selectSharedSettings(global).shouldUseSystemTheme) return;
 
-  global = updateSharedSettings(global, { theme });
+  global = updateSharedSettings(global, { theme, privatexTheme: getPrivateXThemeForScheme(theme) });
   setGlobal(global);
 });
 
@@ -127,12 +127,11 @@ addCallback((global: GlobalState) => {
   }, tabState.id);
 
   const {
-    messageTextSize, shouldUseSystemTheme, timeFormat,
+    messageTextSize, privatexTheme: savedPrivatexTheme, shouldUseSystemTheme, timeFormat,
   } = selectSharedSettings(global);
 
-  const globalTheme = selectTheme(global);
-  const systemTheme = getSystemTheme();
-  const theme = shouldUseSystemTheme ? systemTheme : globalTheme;
+  const privatexTheme = shouldUseSystemTheme ? getPrivateXThemeForScheme(getSystemTheme()) : savedPrivatexTheme;
+  const theme = getPrivateXThemeScheme(privatexTheme);
 
   const performanceType = selectPerformanceSettings(global);
 
@@ -173,11 +172,11 @@ addCallback((global: GlobalState) => {
 
   const canAnimate = selectCanAnimateInterface(global);
 
-  switchTheme(theme, canAnimate);
+  switchTheme(privatexTheme, canAnimate);
   setScrollbarWidthProperty();
 
   // Make sure global has the latest theme. Will cause `switchTheme` on change
-  global = updateSharedSettings(global, { theme });
+  global = updateSharedSettings(global, { theme, privatexTheme });
 
   startWebsync();
 

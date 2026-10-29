@@ -43,7 +43,9 @@ import { forceWebsync } from '../../../util/websync';
 import {
   callApi, callApiLocal, closeApi, initApi, setShouldEnableDebugLog,
 } from '../../../api/gramjs';
+import { clearDeletedMessages } from '../../../privatex/antiDelete/deletedMessagesVault';
 import { removeGlobalFromCache, removeSharedStateFromCache } from '../../cache';
+import { getGhostModeApiSettings } from '../../helpers/privatex';
 import {
   addActionHandler, getGlobal, setGlobal,
 } from '../../index';
@@ -110,6 +112,7 @@ addActionHandler('initApi', async (global, actions): Promise<void> => {
       isTestServerRequested: hasTestParam,
       accountIds,
       hasPasskeySupport: IS_WEBAUTHN_SUPPORTED,
+      ghostMode: getGhostModeApiSettings(global.settings.byKey),
     });
 
     void setShouldEnableDebugLog(Boolean(shouldCollectDebugLogs));
@@ -267,6 +270,10 @@ addActionHandler('requestChannelDifference', (global, actions, payload): ActionR
 });
 
 addActionHandler('reset', async (global, actions): Promise<void> => {
+  if (global.currentUserId) {
+    void clearDeletedMessages(global.currentUserId);
+  }
+
   void cacheApi.clear(MEDIA_CACHE_NAME);
   void cacheApi.clear(MEDIA_CACHE_NAME_AVATARS);
   void cacheApi.clear(MEDIA_PROGRESSIVE_CACHE_NAME);

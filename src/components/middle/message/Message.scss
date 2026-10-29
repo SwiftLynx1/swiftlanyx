@@ -269,6 +269,11 @@
     }
   }
 
+  &.is-deleted-remotely > .message-content-wrapper {
+    opacity: var(--px-deleted-message-opacity, 0.6);
+    filter: saturate(0.4);
+  }
+
   &.is-deleting {
     > .Avatar,
     > .message-content-wrapper {

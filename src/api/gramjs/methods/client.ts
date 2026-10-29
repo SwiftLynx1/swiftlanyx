@@ -49,6 +49,7 @@ import {
   isResponseUpdate, log,
 } from '../helpers/misc';
 import localDb, { clearLocalDb, type InlineBotRepairInfo, type RepairInfo } from '../localDb';
+import { applyGhostMode, updateGhostModeSettings } from '../privatex/ghostMode';
 import { sendApiUpdate } from '../updates/apiUpdateEmitter';
 import { processAndUpdateEntities, processMessageAndUpdateThreadInfo } from '../updates/entityProcessor';
 import {
@@ -103,8 +104,10 @@ export async function init(initialArgs: ApiInitialArgs, onConnected?: NoneToVoid
     userAgent, platform, sessionData, isWebmSupported, maxBufferSize, webAuthToken, dcId,
     shouldForceHttpTransport, shouldAllowHttpTransport,
     shouldDebugExportedSenders, langCode, isTestServerRequested, accountIds,
-    hasPasskeySupport, webAuthUserId,
+    hasPasskeySupport, webAuthUserId, ghostMode,
   } = initialArgs;
+
+  updateGhostModeSettings(ghostMode);
 
   const session = new sessions.CallbackSession(sessionData, onSessionUpdate);
 
@@ -286,6 +289,10 @@ export async function invokeRequest<T extends GramJs.AnyRequest>(
   } = params;
   const shouldReturnTrue = Boolean(params.shouldReturnTrue);
 
+  if (!applyGhostMode(request)) {
+    return undefined;
+  }
+
   let abortSignal: AbortSignal | undefined;
   if (abortControllerChatId) {
     let controller = CHAT_ABORT_CONTROLLERS.get(abortControllerChatId);
@@ -355,6 +362,8 @@ export function invokeRequestBeacon<T extends GramJs.AnyRequest>(
   request: T,
   dcId?: number,
 ) {
+  if (!applyGhostMode(request)) return;
+
   if (DEBUG) {
     log('BEACON', request.className);
   }

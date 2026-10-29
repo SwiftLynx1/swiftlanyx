@@ -67,6 +67,13 @@
     margin-inline-end: 0.1875rem;
   }
 
+  .message-deleted {
+    display: inline-flex;
+    margin-inline-end: 0.1875rem;
+    font-size: 0.875rem;
+    color: var(--color-px-deleted-icon, currentColor);
+  }
+
   .message-imported,
   .message-signature {
     overflow: hidden;
