@@ -13,6 +13,7 @@ import preloadFonts from '../../util/fonts';
 import { loadAndChangeLanguage } from '../../util/localization';
 import { getAccountSlotUrl } from '../../util/multiaccount';
 import { formatPhoneNumber, getCountryCodeByIso, getCountryFromPhoneNumber } from '../../util/phoneNumber';
+import { clearApiCredentials, hasStoredApiCredentials } from '../../privatex/apiCredentials';
 import { navigateBack } from './helpers/backNavigation';
 import { getSuggestedLanguage } from './helpers/getSuggestedLanguage';
 
@@ -240,7 +241,14 @@ const AuthPhoneNumber = ({
     loginWithPasskey();
   });
 
+  const handleChangeApiCredentials = useLastCallback(() => {
+    clearApiCredentials();
+    // The worker client is already created with the old key
+    window.location.reload();
+  });
+
   const isAuthReady = state === 'authorizationStateWaitPhoneNumber';
+  const canChangeApiCredentials = hasStoredApiCredentials();
 
   return (
     <div id="auth-phone-number-form" className="custom-scroll">
@@ -309,6 +317,11 @@ const AuthPhoneNumber = ({
           {passkeyOption && (
             <Button className="auth-button" isText onClick={handleLoginWithPasskey}>
               {lang('LoginPasskey')}
+            </Button>
+          )}
+          {canChangeApiCredentials && (
+            <Button className="auth-button" isText onClick={handleChangeApiCredentials}>
+              {lang('PrivateXApiChange')}
             </Button>
           )}
           {suggestedLanguage && suggestedLanguage !== language && continueText && (

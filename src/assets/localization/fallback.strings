@@ -547,6 +547,13 @@
 "PrivateXAntiDeleteStorage_one" = "Kept messages are stored only on this device for {days} day. Media is available only if it was loaded before deletion.";
 "PrivateXAntiDeleteStorage_other" = "Kept messages are stored only on this device for {days} days. Media is available only if it was loaded before deletion.";
 "PrivateXMessageDeletedAt" = "Deleted {date}";
+"PrivateXApiTitle" = "Connect PrivateX";
+"PrivateXApiNote" = "PrivateX needs its own Telegram API key before you sign in with your phone number. Open {link}, sign in, choose API development tools and create any app, then paste api_id and api_hash below. They are stored only on this device.";
+"PrivateXApiId" = "API ID";
+"PrivateXApiHash" = "API hash";
+"PrivateXApiIdInvalid" = "API ID is a number";
+"PrivateXApiHashInvalid" = "API hash is 32 characters: 0-9 and a-f";
+"PrivateXApiChange" = "Change API key";
 "Language" = "Language";
 "LanguageTitle" = "Change language?";
 "LanguageAlert" = "You are about to apply a language pack ({language}) that is {percent}% complete.\n\nThis will translate the entire interface. You can suggest corrections via the {link}.\n\nYou can change your language back at any time in {settings}.";

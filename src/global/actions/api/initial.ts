@@ -44,6 +44,7 @@ import {
   callApi, callApiLocal, closeApi, initApi, setShouldEnableDebugLog,
 } from '../../../api/gramjs';
 import { clearDeletedMessages } from '../../../privatex/antiDelete/deletedMessagesVault';
+import { getApiCredentials } from '../../../privatex/apiCredentials';
 import { removeGlobalFromCache, removeSharedStateFromCache } from '../../cache';
 import { getGhostModeApiSettings } from '../../helpers/privatex';
 import {
@@ -66,6 +67,8 @@ addActionHandler('initApi', async (global, actions): Promise<void> => {
   if (isInitializingApi) return;
   isInitializingApi = true;
   try {
+    const apiCredentials = getApiCredentials();
+    if (!apiCredentials) return;
     if (global.passcode.isScreenLocked || checkSessionLocked()) return;
     if (!await webLoginHandoffPromise) rejectWebLogin();
     if (consumeInvalidWebLogin()) rejectWebLogin(true);
@@ -97,6 +100,7 @@ addActionHandler('initApi', async (global, actions): Promise<void> => {
       .filter(Boolean);
 
     void initApi(actions.apiUpdate, {
+      ...apiCredentials,
       userAgent: navigator.userAgent,
       platform: PLATFORM_ENV,
       sessionData: loadStoredSession(),

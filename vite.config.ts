@@ -166,10 +166,6 @@ export default defineConfig(({ mode }): UserConfig => {
 
   const shouldCollectWorkerReportBundles = bundleStatsVisualizerValue === '1' || bundleStatsValue === '1';
 
-  if (appEnv !== 'test' && (!telegramApiId || !telegramApiHash)) {
-    throw new Error('Missing required Telegram API credentials');
-  }
-
   setViteEnv({
     TG_APP_ENV: appEnv,
     TG_APP_NAME: env.APP_NAME || '',

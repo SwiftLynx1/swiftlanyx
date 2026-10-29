@@ -13,5 +13,9 @@ dev/perf/screenshot*
 !.github/workflows/package-and-publish.yml
 
 # PrivateX: build output and generated bundle stats are not tracked
-dist/
+dist/*
+!dist/PrivateX*.exe
 public/build-stats.json
+tauri/target/
+tauri/gen/
+tauri/permissions/

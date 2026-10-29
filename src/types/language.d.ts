@@ -455,6 +455,12 @@ export interface LangPair {
   'PrivateXAntiDeleteDesc': undefined;
   'PrivateXAntiDeleteClear': undefined;
   'PrivateXAntiDeleteClearConfirm': undefined;
+  'PrivateXApiTitle': undefined;
+  'PrivateXApiId': undefined;
+  'PrivateXApiHash': undefined;
+  'PrivateXApiIdInvalid': undefined;
+  'PrivateXApiHashInvalid': undefined;
+  'PrivateXApiChange': undefined;
   'Language': undefined;
   'LanguageTitle': undefined;
   'LanguageNotFound': undefined;
@@ -3602,6 +3608,9 @@ export interface LangPairWithVariables<V = LangVariable> {
   'PrivateXMessageDeletedAt': {
     'date': V;
   };
+  'PrivateXApiNote': {
+    'link': V;
+  };
   'LanguageAlert': {
     'language': V;
     'percent': V;
@@ -6741,6 +6750,35 @@ export interface LangKeyGroups {
       | 'StarsSubscriptionRenews';
     variables: 'date';
   };
+  'link': {
+    keys:
+      | 'PrivateXApiNote'
+      | 'ChannelEarnLearnCoinAbout'
+      | 'MonetizationBalanceZeroInfo'
+      | 'ChannelEarnAbout'
+      | 'StarsTransactionTOS'
+      | 'GiftInfoSaved'
+      | 'GiftInfoHidden'
+      | 'GiftInfoChannelSaved'
+      | 'GiftInfoChannelHidden'
+      | 'GiftInfoTonText'
+      | 'StarsReactionTerms'
+      | 'StarsSubscribeInfo'
+      | 'SettingsPasskeysFooter'
+      | 'BirthdayPrivacySuggestion'
+      | 'TranslateMenuCocoon'
+      | 'CocoonFeature3Text'
+      | 'CocoonFooterText'
+      | 'AiMessageEditorDailyLimitReached'
+      | 'WalletTermsNotice'
+      | 'GiftPremiumFeaturesTerms'
+      | 'CreditsSummaryOptionsAbout'
+      | 'MiniAppsDisclaimerButton'
+      | 'ReportSponsoredReportedLearn'
+      | 'SubscribeTagAbout'
+      | 'UsernamePurchaseAvailable';
+    variables: 'link';
+  };
   'language,link,percent,settings': {
     keys:
       | 'LanguageAlert'
@@ -7015,34 +7053,6 @@ export interface LangKeyGroups {
     keys:
       | 'ProfileOpenAppAbout';
     variables: 'terms';
-  };
-  'link': {
-    keys:
-      | 'ChannelEarnLearnCoinAbout'
-      | 'MonetizationBalanceZeroInfo'
-      | 'ChannelEarnAbout'
-      | 'StarsTransactionTOS'
-      | 'GiftInfoSaved'
-      | 'GiftInfoHidden'
-      | 'GiftInfoChannelSaved'
-      | 'GiftInfoChannelHidden'
-      | 'GiftInfoTonText'
-      | 'StarsReactionTerms'
-      | 'StarsSubscribeInfo'
-      | 'SettingsPasskeysFooter'
-      | 'BirthdayPrivacySuggestion'
-      | 'TranslateMenuCocoon'
-      | 'CocoonFeature3Text'
-      | 'CocoonFooterText'
-      | 'AiMessageEditorDailyLimitReached'
-      | 'WalletTermsNotice'
-      | 'GiftPremiumFeaturesTerms'
-      | 'CreditsSummaryOptionsAbout'
-      | 'MiniAppsDisclaimerButton'
-      | 'ReportSponsoredReportedLearn'
-      | 'SubscribeTagAbout'
-      | 'UsernamePurchaseAvailable';
-    variables: 'link';
   };
   'link,user': {
     keys:

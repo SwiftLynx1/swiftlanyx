@@ -1,17 +1,20 @@
 import '../../global/actions/initial';
 
-import { memo } from '../../lib/teact/teact';
+import { memo, useState } from '../../lib/teact/teact';
 import { getActions, withGlobal } from '../../global';
 
 import type { GlobalState } from '../../global/types';
 
 import { IS_TAURI } from '../../util/browser/globalEnvironment';
 import { IS_MAC_OS, PLATFORM_ENV } from '../../util/browser/windowEnvironment';
+import { getApiCredentials } from '../../privatex/apiCredentials';
 
 import useCurrentOrPrev from '../../hooks/useCurrentOrPrev';
 import useHistoryBack from '../../hooks/useHistoryBack';
+import useLastCallback from '../../hooks/useLastCallback';
 
 import Transition from '../ui/Transition';
+import AuthApiCredentials from './AuthApiCredentials';
 import AuthCode from './AuthCode.async';
 import AuthPassword from './AuthPassword.async';
 import AuthPhoneNumber from './AuthPhoneNumber';
@@ -24,12 +27,21 @@ type StateProps = {
   authState: GlobalState['auth']['state'];
 };
 
+const API_CREDENTIALS_SCREEN_KEY = 5;
+
 const Auth = ({
   authState,
 }: StateProps) => {
   const {
-    returnToAuthPhoneNumber, goToAuthQrCode,
+    returnToAuthPhoneNumber, goToAuthQrCode, initApi,
   } = getActions();
+
+  const [hasApiCredentials, setHasApiCredentials] = useState(() => Boolean(getApiCredentials()));
+
+  const handleApiCredentialsSave = useLastCallback(() => {
+    setHasApiCredentials(true);
+    initApi();
+  });
 
   const isMobile = PLATFORM_ENV === 'iOS' || PLATFORM_ENV === 'Android';
 
@@ -54,6 +66,10 @@ const Auth = ({
   );
 
   function getScreen() {
+    if (!hasApiCredentials) {
+      return <AuthApiCredentials onSave={handleApiCredentialsSave} />;
+    }
+
     switch (renderingAuthState) {
       case 'authorizationStateWaitCode':
         return <AuthCode />;
@@ -71,6 +87,8 @@ const Auth = ({
   }
 
   function getActiveKey() {
+    if (!hasApiCredentials) return API_CREDENTIALS_SCREEN_KEY;
+
     switch (renderingAuthState) {
       case 'authorizationStateWaitCode':
         return 0;
